@@ -70,7 +70,8 @@ void init_hardware_controllers(std::string config_path) {
 
   brain.init(
     // PID coefficients, for tuning the error response
-    config.GetInteger("brain", "kp", 1),
+    config.GetInteger("brain", "kp", 100),
+    config.GetInteger("brain", "ki", 0),
     config.GetInteger("brain", "kd", 0)
   );
 
