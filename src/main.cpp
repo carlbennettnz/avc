@@ -29,18 +29,31 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, terminate);
   signal(SIGTERM, terminate);
 
+  double last_error = 0;
+
   // This is our main loop. It continues until the program exits.
   while (!exiting) {
     // Uses the camera to find the line
-    double error = sensors.get_line_error();
+    sensors.process_image();
+
+    double error;
+
+    if (!sensors.could_find_line()) {
+      if (last_error < 0) error = -1;
+      if (last_error > 0) error = 1 ;
+    } else {
+      error = sensors.get_line_error();
+    }
 
     // Right now the sensors just give us the error directly, but eventually the
     // sensors should tell us were the line is and then the brain should give us
     // an error value.
-    std::pair<double, double> velocities = brain.choose_velocities(error);
+    std::pair<double, double> velocities = brain.choose_velocities_pid(error);
 
     // Use the value returned from the brain to set the speeds of our robot
     actuators.set_velocities(velocities.first, velocities.second);
+
+    last_error = error;
   }
 }
 
@@ -84,7 +97,12 @@ void init_hardware_controllers(std::string config_path) {
 
     // Wheel speed coefficients, to adjust for physical errors with the robot
     config.GetReal("actuators", "left_multiplier", 1),
-    config.GetReal("actuators", "right_multiplier", 1)
+    config.GetReal("actuators", "right_multiplier", 1),
+
+    // Gate server config
+    config.Get("actuators", "server_ip", "130.195.6.196"),
+    config.GetInteger("actuators", "server_port", 1024),
+    config.Get("actuators", "server_password", "Please")
   );
 }
 

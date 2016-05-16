@@ -47,10 +47,12 @@ std::pair<double, double> Brain::choose_velocities_pid(double error) {
   double i = total_error;
 
   std::cout
+    << "e: " << error << '\t'
     << "p: " << kp * p << '\t'
     << "i: " << ki * i << '\t'
-    << "d: " << kd * d << '\t';
+    << "d: " << kd * d << '\t'
+    << std::endl;
 
   // Apply coefficients and return
-  return std::make_pair(100.0, kp * p + ki * i + kd * d);
+  return std::make_pair(100.0, -1 * (kp * p + ki * i + kd * d));
 }

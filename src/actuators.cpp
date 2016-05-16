@@ -38,6 +38,8 @@ void Actuators::set_velocities(double forward, double turning) {
   forward_speed = forward / 100;
   turning_speed = turning / 100;
 
+  std::cout << "turning speed: " << turning << std::endl;
+
   // Send the change to the motors
   update();
 }
