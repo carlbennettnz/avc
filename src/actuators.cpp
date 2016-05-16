@@ -5,12 +5,24 @@
   range of wheel speed, while left and right multipliers are used to adjust for
   inequalities in power between the two wheels.
 */
-void Actuators::init(double min, double max, double left, double right) {
+void Actuators::init(
+  double min,
+  double max,
+  double left,
+  double right,
+  std::string ip,
+  int port,
+  std::string password
+) {
   left_multiplier = left;
   right_multiplier = right;
   min_speed = min;
   max_speed = max;
   speed_range = abs(max - min);
+
+  server_ip = ip;
+  server_port = port;
+  server_password = password;
 }
 
 /**
@@ -58,4 +70,18 @@ void Actuators::update() {
     set_motor(1, forward_speed * max_speed * left_multiplier);
     set_motor(2, forward_speed * max_speed * right_multiplier);
   }
+}
+
+/**
+  Attempts to open the gate.
+*/
+void Actuators::open_gate() {
+  char *ip = &server_ip[0];
+  char *password = &server_password[0];
+  char message[24];
+
+  connect_to_server(ip, server_port);
+  send_to_server(password);
+  receive_from_server(message);
+  send_to_server(message);
 }
