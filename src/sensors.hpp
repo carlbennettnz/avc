@@ -15,7 +15,6 @@ class Sensors {
   void process_image();
   bool could_find_line();
   double get_line_error();
-  double get_line_error_2();
   // void get_ir_position();
   double line_error;
  
