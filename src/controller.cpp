@@ -26,14 +26,18 @@ void Controller::follow_line() {
 
   double turning_speed;
 
-  if (!sensors->could_find_line()) {
+  if (sensors->could_find_line_ahead()) {
+    line_error = sensors->get_line_error();
+    turning_speed = line_pid->calc(line_error);
+  } else if (sensors->could_find_line_left()) { // Prioritise left turns
+    turning_speed = -100;
+  } else if (sensors->could_find_line_right()) {
+    turning_speed = 100;
+  } else {
     // We've lost the line, so turn as fast as we can back towards the last
     // place we saw it.
     if (line_error < 0) turning_speed = -100;
     if (line_error > 0) turning_speed = 100;
-  } else {
-    line_error = sensors->get_line_error();
-    turning_speed = line_pid->calc(line_error);
   }
 
   // Use the value returned from the brain to set the speeds of our robot
