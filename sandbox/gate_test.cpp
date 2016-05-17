@@ -8,7 +8,7 @@ extern "C" int receive_from_server(char message[24]);
 
 char server_ip[] = "130.195.6.196";
 int server_port = 1024;
-char server_password[] = "Please\0";
+char server_password[] = "Please";
 
 int main() {
   init_hardware();
