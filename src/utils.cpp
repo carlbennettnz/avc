@@ -13,3 +13,9 @@ void constrain(double min, double max, double *value) {
     *value = max;
   }
 }
+
+long get_time() {
+  struct timeval now;
+  gettimeofday(&now, 0);
+  return  now.tv_sec * 1000 * 1000 + now.tv_usec; // Combine sec and usec components
+}

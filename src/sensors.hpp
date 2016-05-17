@@ -1,6 +1,7 @@
 #ifndef __SENSORS_H_INCLUDED__
 #define __SENSORS_H_INCLUDED__
 
+#include <iostream>
 #include <algorithm>
 
 #include "utils.hpp"
@@ -16,12 +17,12 @@ class Sensors {
   double get_line_error();
   double get_line_error_2();
   // void get_ir_position();
+  double line_error;
  
  private:
   int img_width;
   int img_height;
-  bool found_line;
-  double line_error;
+  int found_line;
 };
 
 #endif

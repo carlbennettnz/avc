@@ -9,11 +9,12 @@
 #include <string>
 
 #include "../lib/inih/cpp/INIReader.h"
+#include "controller.hpp"
 #include "sensors.hpp"
-#include "brain.hpp"
 #include "actuators.hpp"
+#include "pid.hpp"
 
-extern "C" int init_hardware();
+extern "C" int init(int);
 extern "C" int set_motor(int motor, int speed);
 
 int main(int, char**);

@@ -3,9 +3,10 @@
 // Our main loop only runs while this flag is true
 bool exiting = false;
 
+Controller controller;
 Sensors sensors;
-Brain brain;
 Actuators actuators;
+PID line_pid;
 
 int main(int argc, char *argv[]) {
   // Default config file path
@@ -17,9 +18,9 @@ int main(int argc, char *argv[]) {
   }
 
   // Boot up the E101 library.
-  init_hardware();
+  init(0);
 
-  // Read the config file and use the information in it to 
+  // Read the config file and use the information in it to initialise everything
   init_hardware_controllers(config_path);
 
   // Here we set up listeners for program interruption (SIGINT) or termination
@@ -29,31 +30,9 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, terminate);
   signal(SIGTERM, terminate);
 
-  double last_error = 0;
-
   // This is our main loop. It continues until the program exits.
   while (!exiting) {
-    // Uses the camera to find the line
-    sensors.process_image();
-
-    double error;
-
-    if (!sensors.could_find_line()) {
-      if (last_error < 0) error = -1;
-      if (last_error > 0) error = 1 ;
-    } else {
-      error = sensors.get_line_error();
-    }
-
-    // Right now the sensors just give us the error directly, but eventually the
-    // sensors should tell us were the line is and then the brain should give us
-    // an error value.
-    std::pair<double, double> velocities = brain.choose_velocities_pid(error);
-
-    // Use the value returned from the brain to set the speeds of our robot
-    actuators.set_velocities(velocities.first, velocities.second);
-
-    last_error = error;
+    controller.go();
   }
 }
 
@@ -81,13 +60,6 @@ void init_hardware_controllers(std::string config_path) {
     config.GetInteger("sensors", "img_height", 240)
   );
 
-  brain.init(
-    // PID coefficients, for tuning the error response
-    config.GetInteger("brain", "kp", 100),
-    config.GetInteger("brain", "ki", 0),
-    config.GetInteger("brain", "kd", 0)
-  );
-
   actuators.init(
     // Minimum speed. Value to send to motors when speed is just above zero.
     config.GetInteger("actuators", "min_speed", 0),
@@ -104,6 +76,15 @@ void init_hardware_controllers(std::string config_path) {
     config.GetInteger("actuators", "server_port", 1024),
     config.Get("actuators", "server_password", "Please")
   );
+
+  line_pid.init(
+    // PID coefficients, for tuning the error response
+    config.GetInteger("brain", "kp", 100),
+    config.GetInteger("brain", "ki", 0),
+    config.GetInteger("brain", "kd", 0)
+  );
+
+  controller.init(&sensors, &actuators, &line_pid);
 }
 
 /**
@@ -117,7 +98,7 @@ void terminate(int signum) {
   exiting = true;
 
   // Stop the wheels
-  actuators.stop_all();
+  controller.stop();
 
   // Exit for real
   exit(signum);

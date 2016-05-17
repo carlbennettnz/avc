@@ -11,7 +11,7 @@
 #include "utils.hpp"
 
 extern "C" int set_motor(int motor, int speed);
-extern "C" int connect_to_server( char server_addr[15],int port);
+extern "C" int connect_to_server( char server_addr[15], int port);
 extern "C" int send_to_server(char message[24]);
 extern "C" int receive_from_server(char message[24]);
 
