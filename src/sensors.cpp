@@ -3,10 +3,10 @@
 /**
   Stores the image dimensions for later use.
 */
-void Sensors::init(double width, double height) {
+void Sensors::init(double width, double height, int threshold) {
   img_width = width;
   img_height = height;
-  brightness_threshold = 140;
+  brightness_threshold = threshold;
 }
 
 /**
@@ -17,14 +17,36 @@ void Sensors::init(double width, double height) {
 void Sensors::process_image() {
   take_picture();
 
-  auto ahead = get_error_from_row(img_height / 2);
-  auto left  = get_error_from_col(10);
-  auto right = get_error_from_col(img_width - 10);
+  double ahead_pixels[320];
+  double left_pixels[240];
+  double right_pixels[240];
+
+  double average_brightness = get_average_brightness();
+
+  get_row(ahead_pixels, img_height - 40 - 1, 20);
+  get_col(left_pixels, img_width - 10 - 1, 10);
+  get_col(right_pixels, 10 - 1, 3);
+
+  auto ahead = get_error_from_array(ahead_pixels, img_width, average_brightness);
+  auto left  = get_error_from_array(left_pixels, img_height, average_brightness);
+  auto right = get_error_from_array(right_pixels, img_height, average_brightness);
   
   found_line_ahead = std::get<0>(ahead);
   found_line_left  = std::get<0>(left);
   found_line_right = std::get<0>(right);
   line_error = std::get<1>(ahead);
+}
+
+double Sensors::get_average_brightness() {
+  int total = 0;
+
+  for (int y = 0; y < img_height; y++) {
+    for (int x = 0; x < img_width; x++) {
+      total += get_pixel(x, y, 3);
+    }
+  }
+
+  return (double) total / img_width / img_height;
 }
 
 double Sensors::get_line_error() {
@@ -35,36 +57,61 @@ bool Sensors::could_find_line_ahead() { return found_line_ahead; }
 bool Sensors::could_find_line_left()  { return found_line_left;  }
 bool Sensors::could_find_line_right() { return found_line_right; }
 
-std::tuple<bool, double> Sensors::get_error_from_row(int rowIndex) {
-  bool found_line = false;
-  double error = 0;
+void Sensors::get_row(double row[], int rowIndex, int spread) {
+  for (int i = 0; i < img_width; i++) {
+    int total = 0;
 
-  for (int x = 0; x < img_width; x++) {
-    if (get_pixel(x, rowIndex, 3) > brightness_threshold) {
-      found_line = true;
-      error += x - (img_width / 2);
+    for (int j = -spread; j <= spread; j++) {
+      total += get_pixel(i, rowIndex + j, 3);
     }
+
+    row[i] = (double) total / (2 * spread + 1);
   }
-
-  // Normalise the error so -1 < err < 1
-  error = error / img_width / (img_width / 2);
-
-  return std::make_tuple(found_line, error);
 }
 
-std::tuple<bool, double> Sensors::get_error_from_col(int colIndex) {
-  bool found_line = false;
+void Sensors::get_col(double col[], int colIndex, int spread) {
+  for (int i = 0; i < img_height; i++) {
+    int total = 0;
+
+    for (int j = -spread; j <= spread; j++) {
+      total += get_pixel(colIndex + j, i, 3);
+    }
+
+    col[i] = (double) total / (2 * spread + 1);
+  }
+}
+
+std::tuple<bool, double> Sensors::get_error_from_array(double pixels[], int array_size, double average_brightness) {
+  int number_found = 0;
   double error = 0;
 
-  for (int y = 0; y < img_height; y++) {
-    if (get_pixel(y, colIndex, 3) > brightness_threshold) {
-      found_line = true;
-      error += y - (img_height / 2);
+  for (int i = 0; i < array_size; i++) {
+    if (pixels[i] - brightness_threshold > average_brightness) {
+      number_found++;
+      error += i - (img_width / 2);
     }
   }
 
   // Normalise the error so -1 < err < 1
-  error = error / img_height / (img_height / 2);
+  error = error * 10000 / number_found / img_width / (img_width / 2);
 
-  return std::make_tuple(found_line, error);
+  return std::make_tuple(number_found > 0, error);
+}
+
+void Sensors::process_ir_data() {
+
+}
+
+bool Sensors::could_find_walls() {
+  return false;
+}
+
+void Sensors::print_image() {
+  for (int y = 0; y < 240; y += 10) {
+    for (int x = 0; x < 320; x += 10) {
+      std::cout << (get_pixel(x, y, 3) > 120) << ' ';
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
 }

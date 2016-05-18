@@ -57,7 +57,8 @@ void init_hardware_controllers(std::string config_path) {
   sensors.init(
     // The third value is the default
     config.GetInteger("sensors", "img_width", 320),
-    config.GetInteger("sensors", "img_height", 240)
+    config.GetInteger("sensors", "img_height", 240),
+    config.GetInteger("sensors", "brightness_threshold", 140)
   );
 
   actuators.init(

@@ -13,10 +13,11 @@ class Controller {
     void init(Sensors* s, Actuators* a, PID* l);
     void go();
     void stop();
-    void check();
 
   private:
+    void update_stage();
     void follow_line();
+    void navigate_maze();
 
     Sensors* sensors;
     Actuators* actuators;
@@ -26,6 +27,8 @@ class Controller {
 
     // Line following
     double line_error;
+    bool is_turning_left;
+    bool is_turning_right;
 };
 
 #endif
