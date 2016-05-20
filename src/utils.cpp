@@ -14,8 +14,8 @@ void constrain(double min, double max, double *value) {
   }
 }
 
-long get_time() {
+unsigned long get_time() {
   struct timeval now;
   gettimeofday(&now, 0);
-  return  now.tv_sec * 1000 * 1000 + now.tv_usec; // Combine sec and usec components
+  return (unsigned long) now.tv_sec * 1000 * 1000 + (unsigned long) now.tv_usec; // Combine sec and usec components
 }

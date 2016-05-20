@@ -4,6 +4,6 @@
 #include <sys/time.h>
 
 void constrain(double min, double max, double *value);
-long get_time();
+unsigned long get_time();
 
 #endif

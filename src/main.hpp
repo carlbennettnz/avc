@@ -10,9 +10,10 @@
 
 #include "../lib/inih/cpp/INIReader.h"
 #include "controller.hpp"
-#include "sensors.hpp"
+#include "camera.hpp"
 #include "actuators.hpp"
 #include "pid.hpp"
+#include "reporter.hpp"
 
 extern "C" int init(int);
 extern "C" int set_motor(int motor, int speed);

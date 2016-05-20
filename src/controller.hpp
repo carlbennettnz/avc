@@ -4,13 +4,16 @@
 #include <iostream>
 #include <string>
 
-#include "sensors.hpp"
+#include "camera.hpp"
+#include "ir.hpp"
 #include "actuators.hpp"
 #include "pid.hpp"
+#include "reporter.hpp"
+#include "utils.hpp"
 
 class Controller {
   public:
-    void init(Sensors* s, Actuators* a, PID* l);
+    void init(Camera* c, IR* i, Actuators* a, PID* l, PID* w, Reporter* r);
     void go();
     void stop();
 
@@ -19,16 +22,24 @@ class Controller {
     void follow_line();
     void navigate_maze();
 
-    Sensors* sensors;
+    Camera* camera;
+    IR* ir;
     Actuators* actuators;
     PID* line_pid;
+    PID* wall_pid;
+    Reporter* reporter;
 
-    std::string stage = "line";
+    unsigned long maze_start_time;
+    std::string stage = "maze";
 
     // Line following
     double line_error;
     bool is_turning_left;
     bool is_turning_right;
+
+    int last_front = 0;
+    int current_manoeuvre = 0;
+    long current_manoeuvre_end_time;
 };
 
 #endif

@@ -1,9 +1,9 @@
-#include "sensors.hpp"
+#include "camera.hpp"
 
 /**
   Stores the image dimensions for later use.
 */
-void Sensors::init(double width, double height, int threshold) {
+void Camera::init(double width, double height, int threshold) {
   img_width = width;
   img_height = height;
   brightness_threshold = threshold;
@@ -14,7 +14,7 @@ void Sensors::init(double width, double height, int threshold) {
   middle line of pixels and finding the brightness on the left side verses the
   right.
 */
-void Sensors::process_image() {
+void Camera::process_image() {
   take_picture();
 
   double ahead_pixels[320];
@@ -37,27 +37,27 @@ void Sensors::process_image() {
   line_error = std::get<1>(ahead);
 }
 
-double Sensors::get_average_brightness() {
+double Camera::get_average_brightness(int color) {
   int total = 0;
 
   for (int y = 0; y < img_height; y++) {
     for (int x = 0; x < img_width; x++) {
-      total += get_pixel(x, y, 3);
+      total += get_pixel(x, y, color);
     }
   }
 
   return (double) total / img_width / img_height;
 }
 
-double Sensors::get_line_error() {
+double Camera::get_line_error() {
   return line_error;
 }
 
-bool Sensors::could_find_line_ahead() { return found_line_ahead; }
-bool Sensors::could_find_line_left()  { return found_line_left;  }
-bool Sensors::could_find_line_right() { return found_line_right; }
+bool Camera::could_find_line_ahead() { return found_line_ahead; }
+bool Camera::could_find_line_left()  { return found_line_left;  }
+bool Camera::could_find_line_right() { return found_line_right; }
 
-void Sensors::get_row(double row[], int rowIndex, int spread) {
+void Camera::get_row(double row[], int rowIndex, int spread) {
   for (int i = 0; i < img_width; i++) {
     int total = 0;
 
@@ -69,7 +69,7 @@ void Sensors::get_row(double row[], int rowIndex, int spread) {
   }
 }
 
-void Sensors::get_col(double col[], int colIndex, int spread) {
+void Camera::get_col(double col[], int colIndex, int spread) {
   for (int i = 0; i < img_height; i++) {
     int total = 0;
 
@@ -81,7 +81,7 @@ void Sensors::get_col(double col[], int colIndex, int spread) {
   }
 }
 
-std::tuple<bool, double> Sensors::get_error_from_array(double pixels[], int array_size, double average_brightness) {
+std::tuple<bool, double> Camera::get_error_from_array(double pixels[], int array_size, double average_brightness) {
   int number_found = 0;
   double error = 0;
 
@@ -98,15 +98,13 @@ std::tuple<bool, double> Sensors::get_error_from_array(double pixels[], int arra
   return std::make_tuple(number_found > 0, error);
 }
 
-void Sensors::process_ir_data() {
-
+bool Camera::can_see_red() {
+  double level = get_average_brightness(1) / get_average_brightness();
+  // std::cout << "redness " << level << std::endl;
+  return level < 0.95;
 }
 
-bool Sensors::could_find_walls() {
-  return false;
-}
-
-void Sensors::print_image() {
+void Camera::print_image() {
   for (int y = 0; y < 240; y += 10) {
     for (int x = 0; x < 320; x += 10) {
       std::cout << (get_pixel(x, y, 3) > 120) << ' ';

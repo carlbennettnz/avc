@@ -4,9 +4,12 @@
 bool exiting = false;
 
 Controller controller;
-Sensors sensors;
+Camera camera;
+IR ir;
 Actuators actuators;
 PID line_pid;
+PID wall_pid;
+Reporter reporter;
 
 int main(int argc, char *argv[]) {
   // Default config file path
@@ -54,11 +57,16 @@ void init_hardware_controllers(std::string config_path) {
   // Now we have access to the settings file, we have the information we need
   // to start initialising the objects which control our robot.
 
-  sensors.init(
+  camera.init(
     // The third value is the default
-    config.GetInteger("sensors", "img_width", 320),
-    config.GetInteger("sensors", "img_height", 240),
-    config.GetInteger("sensors", "brightness_threshold", 140)
+    config.GetInteger("camera", "img_width", 320),
+    config.GetInteger("camera", "img_height", 240),
+    config.GetInteger("camera", "brightness_threshold", 140)
+  );
+
+  ir.init(
+    config.GetInteger("ir", "left_chan", 0),
+    config.GetInteger("ir", "right_chan", 1)
   );
 
   actuators.init(
@@ -80,12 +88,26 @@ void init_hardware_controllers(std::string config_path) {
 
   line_pid.init(
     // PID coefficients, for tuning the error response
-    config.GetInteger("brain", "kp", 100),
-    config.GetInteger("brain", "ki", 0),
-    config.GetInteger("brain", "kd", 0)
+    config.GetReal("line_following", "kp", 100),
+    config.GetReal("line_following", "ki", 0),
+    config.GetReal("line_following", "kd", 0)
   );
 
-  controller.init(&sensors, &actuators, &line_pid);
+  wall_pid.init(
+    // PID coefficients, for tuning the error response
+    config.GetReal("wall_following", "kp", 100),
+    config.GetReal("wall_following", "ki", 0),
+    config.GetReal("wall_following", "kd", 0)
+  );
+
+  reporter.init(
+    config.Get("reporter", "server_host", "localhost"),
+    config.GetInteger("reporter", "server_port", 1024)
+  );
+
+  // reporter.connect_to_server();
+
+  controller.init(&camera, &ir, &actuators, &line_pid, &wall_pid, &reporter);
 }
 
 /**

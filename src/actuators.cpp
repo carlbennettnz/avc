@@ -26,12 +26,12 @@ void Actuators::init(
 }
 
 /**
-  Sets the wheel velocities to the closest valid values. Forward speed is from 0
-  to 100, while turning speed is from -100 (hard left) to 100 (hard right).
+  Sets the wheel velocities to the closest valid values. Forward speed is from
+  -100 to 100, while turning speed is from -100 (hard left) to 100 (hard right).
 */
 void Actuators::set_velocities(double forward, double turning) {
   // Ensure the given values are valid
-  constrain(0, 100, &forward);
+  constrain(-100, 100, &forward);
   constrain(-100, 100, &turning);
 
   // Set the instance fields
@@ -78,12 +78,24 @@ void Actuators::update() {
   Attempts to open the gate.
 */
 void Actuators::open_gate() {
-  char *ip = &server_ip[0];
-  char *password = &server_password[0];
-  char message[24];
+  // char *ip = &server_ip[0];
+  // char *password = &server_password[0];
+  // char message[24];
 
-  connect_to_server(ip, server_port);
-  send_to_server(password);
+  // std::cout << "connecting to " << ip << " " << server_port << std::endl;
+  // connect_to_server(ip, server_port);
+  // send_to_server(password);
+  // receive_from_server(message);
+  // send_to_server(message);
+
+  char server_ip[] = "130.195.6.196";
+  int server_port = 1024;
+  char server_password[] = "Please";
+
+  connect_to_server(server_ip, server_port);
+  send_to_server(server_password);
+
+  char message[24];
   receive_from_server(message);
   send_to_server(message);
 }

@@ -1,16 +1,22 @@
 #include <iostream>
 #include <unistd.h>
+#include "../src/ir.hpp"
 
 extern "C" int init_hardware();
-extern "C" int read_analog(int pin);
 
 int main() {
   init_hardware();
+  IR ir;
+  ir.init(1, 0);
 
   while (true) {
-    int left = read_analog(1);
-    int right = read_analog(0);
-    std::cout << left << '\t' << right << '\t' << right - left << std::endl;
+    int left = ir.get_left();
+    int right = ir.get_right();
+    int front = ir.get_front();
+    int error = ir.get_wall_error();
+    bool can_see_wall = ir.can_see_walls();
+
+    std::cout << can_see_wall << '\t' << left << '\t' << right << '\t' << front << '\t' << error << std::endl;
     usleep(50000);
   }
 }
