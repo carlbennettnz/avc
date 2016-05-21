@@ -1,12 +1,12 @@
 #include "controller.hpp"
 
-void Controller::init(Camera* c, IR* i, Actuators* a, PID* l, PID* w, Reporter* r) {
-  camera = c;
-  ir = i;
-  actuators = a;
-  line_pid = l;
-  wall_pid = w;
-  reporter = r;
+void Controller::init(components* comp) {
+  camera = comp->camera;
+  ir = comp->ir;
+  actuators = comp->actuators;
+  line_pid = comp->line_pid;
+  wall_pid = comp->wall_pid;
+  reporter = comp->reporter;
 }
 
 void Controller::go() {

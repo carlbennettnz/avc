@@ -14,6 +14,9 @@ void constrain(double min, double max, double *value) {
   }
 }
 
+/**
+ * Get the current time in microseconds since the epoch.
+ */
 unsigned long get_time() {
   struct timeval now;
   gettimeofday(&now, 0);

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "components.hpp"
 #include "camera.hpp"
 #include "ir.hpp"
 #include "actuators.hpp"
@@ -13,7 +14,7 @@
 
 class Controller {
   public:
-    void init(Camera* c, IR* i, Actuators* a, PID* l, PID* w, Reporter* r);
+    void init(components* comp);
     void go();
     void stop();
 

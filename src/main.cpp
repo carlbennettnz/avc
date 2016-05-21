@@ -4,12 +4,15 @@
 bool exiting = false;
 
 Controller controller;
+
 Camera camera;
 IR ir;
 Actuators actuators;
 PID line_pid;
 PID wall_pid;
 Reporter reporter;
+
+components bundle = { &camera, &ir, &actuators, &line_pid, &wall_pid, &reporter };
 
 int main(int argc, char *argv[]) {
   // Default config file path
@@ -57,19 +60,19 @@ void init_hardware_controllers(std::string config_path) {
   // Now we have access to the settings file, we have the information we need
   // to start initialising the objects which control our robot.
 
-  camera.init(
+  bundle.camera->init(
     // The third value is the default
     config.GetInteger("camera", "img_width", 320),
     config.GetInteger("camera", "img_height", 240),
     config.GetInteger("camera", "brightness_threshold", 140)
   );
 
-  ir.init(
+  bundle.ir->init(
     config.GetInteger("ir", "left_chan", 0),
     config.GetInteger("ir", "right_chan", 1)
   );
 
-  actuators.init(
+  bundle.actuators->init(
     // Minimum speed. Value to send to motors when speed is just above zero.
     config.GetInteger("actuators", "min_speed", 0),
     
@@ -86,28 +89,28 @@ void init_hardware_controllers(std::string config_path) {
     config.Get("actuators", "server_password", "Please")
   );
 
-  line_pid.init(
+  bundle.line_pid->init(
     // PID coefficients, for tuning the error response
     config.GetReal("line_following", "kp", 100),
     config.GetReal("line_following", "ki", 0),
     config.GetReal("line_following", "kd", 0)
   );
 
-  wall_pid.init(
+  bundle.wall_pid->init(
     // PID coefficients, for tuning the error response
     config.GetReal("wall_following", "kp", 100),
     config.GetReal("wall_following", "ki", 0),
     config.GetReal("wall_following", "kd", 0)
   );
 
-  reporter.init(
+  bundle.reporter->init(
     config.Get("reporter", "server_host", "localhost"),
     config.GetInteger("reporter", "server_port", 1024)
   );
 
   // reporter.connect_to_server();
 
-  controller.init(&camera, &ir, &actuators, &line_pid, &wall_pid, &reporter);
+  controller.init(&bundle);
 }
 
 /**
