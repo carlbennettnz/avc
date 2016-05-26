@@ -94,7 +94,7 @@ void Controller::navigate_maze() {
 
   // Check for new manoeuvres to perform
   if (current_manoeuvre == 0) {
-    if (ir->get_front() > 230 && last_front > 170 && ir->get_left() < 200 && ir->get_right() > 230) {
+    if (ir->get_front() > 230 && ir->get_left() < 175 && ir->get_right() > 210) {
       current_manoeuvre = 1;
       current_manoeuvre_end_time = time + 850 * 1000;
       std::cout << "started left turn" << std::endl;
@@ -103,14 +103,12 @@ void Controller::navigate_maze() {
 
   // Perform manoeuvre or keep right
   if (current_manoeuvre == 1) {
-    turning_speed = -100;
+    turning_speed = -80;
   } else {
     error = (double) ir->get_right_wall_error();
     turning_speed = wall_pid->calc(error);
-    constrain(-60, 60, &turning_speed);
+    constrain(-70, 70, &turning_speed);
   }
-
-  last_front = ir->get_front();
 
   actuators->set_velocities(100, turning_speed);
 }
