@@ -47,9 +47,9 @@ int IR::get_wall_error() {
 }
 
 int IR::get_left_wall_error() {
-  return get_left() - 320;
+  return get_left() - 500;
 }
 
 int IR::get_right_wall_error() {
-  return get_right() - 380;
+  return get_right() - 500;
 }

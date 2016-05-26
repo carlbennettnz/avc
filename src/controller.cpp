@@ -76,13 +76,15 @@ void Controller::follow_line() {
 }
 
 void Controller::navigate_maze() {
-  double error;
-  double turning_speed;
+  double left = ir->get_left();
+  double right = ir->get_right();
+  double front = ir->get_front();
+
   std::cout
-    << "l " << ir->get_left() << '\t'
-    << "r " << ir->get_right() << '\t'
-    << "f " << ir->get_front() << '\t'
-    << "e " << (ir->get_right() - 350) << '\t'
+    << "l " << left << '\t'
+    << "r " << right << '\t'
+    << "f " << front << '\t'
+    << "e " << (right - 350) << '\t'
     << std::endl;
 
   long time = get_time();
@@ -94,21 +96,26 @@ void Controller::navigate_maze() {
 
   // Check for new manoeuvres to perform
   if (current_manoeuvre == 0) {
-    if (ir->get_front() > 230 && ir->get_left() < 175 && ir->get_right() > 210) {
+    if (front > 210 && left < 175 && right > 250) {
       current_manoeuvre = 1;
-      current_manoeuvre_end_time = time + 850 * 1000;
+      current_manoeuvre_end_time = time + 750 * 1000;
       std::cout << "started left turn" << std::endl;
+    } else if (front > 350 && left > 350 && right > 350) {
+      current_manoeuvre = 2;
+      current_manoeuvre_end_time = time + 950 * 1000;
     }
   }
 
   // Perform manoeuvre or keep right
   if (current_manoeuvre == 1) {
-    turning_speed = -80;
+    actuators->set_velocities(100, -100);
+  } else if (current_manoeuvre == 2) {
+    actuators->set_velocities(100, 0, true);
   } else {
-    error = (double) ir->get_right_wall_error();
-    turning_speed = wall_pid->calc(error);
+    double error = (double) ir->get_right_wall_error();
+    double turning_speed = wall_pid->calc(error);
     constrain(-70, 70, &turning_speed);
+    actuators->set_velocities(100, turning_speed);
   }
 
-  actuators->set_velocities(100, turning_speed);
 }

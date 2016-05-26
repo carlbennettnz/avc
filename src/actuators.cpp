@@ -29,7 +29,9 @@ void Actuators::init(
   Sets the wheel velocities to the closest valid values. Forward speed is from
   -100 to 100, while turning speed is from -100 (hard left) to 100 (hard right).
 */
-void Actuators::set_velocities(double forward, double turning) {
+void Actuators::set_velocities(double forward, double turning, bool _doDonuts) {
+  doDonuts = _doDonuts;
+
   // Ensure the given values are valid
   constrain(-100, 100, &forward);
   constrain(-100, 100, &turning);
@@ -62,7 +64,11 @@ void Actuators::stop_all() {
   speed.
 */
 void Actuators::update() {
-  if (turning_speed < 0 ) {
+  std::cout << doDonuts << std::endl;
+  if (doDonuts) {
+    set_motor(1, forward_speed * max_speed * left_multiplier);
+    set_motor(2, -forward_speed * max_speed * right_multiplier);
+  } else if (turning_speed < 0 ) {
     set_motor(1, forward_speed * max_speed * left_multiplier * (1 + turning_speed));
     set_motor(2, forward_speed * max_speed * right_multiplier);
   } else if (turning_speed > 0) {

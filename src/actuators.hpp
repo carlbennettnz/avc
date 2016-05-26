@@ -26,7 +26,7 @@ class Actuators {
         int port,
         std::string password
     );
-    void set_velocities(double, double);
+    void set_velocities(double, double, bool = false);
     void stop_all();
     void open_gate();
 
@@ -38,6 +38,8 @@ class Actuators {
     double left_multiplier;
     double right_multiplier;
     double speed_range;
+    bool doDonuts;
+
     std::string server_ip;
     int server_port;
     std::string server_password;
