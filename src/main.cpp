@@ -7,12 +7,13 @@ Controller controller;
 
 Camera camera;
 IR ir;
-Actuators actuators;
+Gate gate;
+Motors motors;
 PID line_pid;
 PID wall_pid;
 Reporter reporter;
 
-components bundle = { &camera, &ir, &actuators, &line_pid, &wall_pid, &reporter };
+components bundle = { &camera, &ir, &gate, &motors, &line_pid, &wall_pid, &reporter };
 
 int main(int argc, char *argv[]) {
   // Default config file path
@@ -72,21 +73,21 @@ void init_hardware_controllers(std::string config_path) {
     config.GetInteger("ir", "right_chan", 1)
   );
 
-  bundle.actuators->init(
-    // Minimum speed. Value to send to motors when speed is just above zero.
-    config.GetInteger("actuators", "min_speed", 0),
-    
-    // Maximum speed
-    config.GetInteger("actuators", "max_speed", 255),
+  bundle.motors->init(
+    // Min and max speeds. Min is sent to motors when speed is just above zero.
+    config.GetInteger("motors", "min_speed", 0),
+    config.GetInteger("motors", "max_speed", 255),
 
     // Wheel speed coefficients, to adjust for physical errors with the robot
-    config.GetReal("actuators", "left_multiplier", 1),
-    config.GetReal("actuators", "right_multiplier", 1),
+    config.GetReal("motors", "left_multiplier", 1),
+    config.GetReal("motors", "right_multiplier", 1)
+  );
 
+  bundle.gate->init(
     // Gate server config
-    config.Get("actuators", "server_ip", "130.195.6.196"),
-    config.GetInteger("actuators", "server_port", 1024),
-    config.Get("actuators", "server_password", "Please")
+    config.Get("gate", "server_ip", "130.195.6.196"),
+    config.GetInteger("gate", "server_port", 1024),
+    config.Get("gate", "server_password", "Please")
   );
 
   bundle.line_pid->init(
@@ -110,7 +111,12 @@ void init_hardware_controllers(std::string config_path) {
 
   // reporter.connect_to_server();
 
-  controller.init(&bundle);
+  controller.init(
+    &bundle,
+    config.Get("controller", "stage", "line"),
+    config.GetReal("controller", "line_speed", 20),
+    config.GetReal("controller", "maze_speed", 25)
+  );
 }
 
 /**

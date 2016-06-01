@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
       camera.could_find_line_right()
     );
 
-    // camera.print_image();
+    camera.print_image();
     camera.can_see_red();
 
     usleep(1000 * 1000);

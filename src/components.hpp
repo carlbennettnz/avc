@@ -3,14 +3,16 @@
 
 #include "camera.hpp"
 #include "ir.hpp"
-#include "actuators.hpp"
+#include "gate.hpp"
+#include "motors.hpp"
 #include "pid.hpp"
 #include "reporter.hpp"
 
 struct components {
   Camera* camera;
   IR* ir;
-  Actuators* actuators;
+  Gate* gate;
+  Motors* motors;
   PID* line_pid;
   PID* wall_pid;
   Reporter* reporter;

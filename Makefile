@@ -18,7 +18,7 @@ camera_test:
 	$(call upload,camera_test)
 
 drive_test:
-	pi-g++ sandbox/drive_test.cpp src/actuators.cpp lib/inih/ini.cpp lib/inih/cpp/INIReader.cpp src/utils.cpp -Wall -std=c++11 -Llib -lE101 -lmmal -lbcm_host -Wl,-rpath,./lib -o bin/drive_test
+	pi-g++ sandbox/drive_test.cpp src/motors.cpp lib/inih/ini.cpp lib/inih/cpp/INIReader.cpp src/utils.cpp -Wall -std=c++11 -Llib -lE101 -lmmal -lbcm_host -Wl,-rpath,./lib -o bin/drive_test
 	$(call upload,drive_test)
 
 gate_test:
