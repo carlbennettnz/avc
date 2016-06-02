@@ -1,6 +1,6 @@
 #include "controller.hpp"
 
-void Controller::init(components* comp, std::string _stage, double _line_speed, double _maze_speed) {
+void Controller::init(components* comp, std::string _stage, control_params* _params) {
   camera = comp->camera;
   ir = comp->ir;
   gate = comp->gate;
@@ -11,8 +11,7 @@ void Controller::init(components* comp, std::string _stage, double _line_speed, 
 
   stage = _stage;
 
-  line_speed = _line_speed;
-  maze_speed = _maze_speed;
+  params = _params;
 }
 
 void Controller::go() {
@@ -72,7 +71,7 @@ void Controller::follow_line() {
   }
 
   // Use the value returned from the brain to set the speeds of our robot
-  motors->set_velocities(line_speed, turning_speed);
+  motors->set_velocities(params->line_speed, turning_speed);
 }
 
 void Controller::navigate_maze() {
@@ -91,30 +90,30 @@ void Controller::navigate_maze() {
 
   if (current_manoeuvre && current_manoeuvre_end_time < time) {
     current_manoeuvre = 0;
-    std::cout << "--- ended left turn ---" << std::endl;
+    // std::cout << "--- ended left turn ---" << std::endl;
   }
 
   // Check for new manoeuvres to perform
   if (current_manoeuvre == 0) {
-    if (front > 210 && left < 175 && right > 250) {
+    if (front > 180 && left < 175 && right > 250) {
       current_manoeuvre = 1;
-      current_manoeuvre_end_time = time + 750 * 1000;
-      std::cout << "--- started left turn ---" << std::endl;
+      current_manoeuvre_end_time = time + params->turn_left_time * 1000 * 1000;
+      // std::cout << "--- started left turn ---" << std::endl;
     } else if (front > 350 && left > 350 && right > 350) {
       current_manoeuvre = 2;
-      current_manoeuvre_end_time = time + 950 * 1000;
+      current_manoeuvre_end_time = time + params->turn_180_time * 1000 * 1000;
     }
   }
 
   // Perform manoeuvre or keep right
   if (current_manoeuvre == 1) {
-    motors->set_velocities(maze_speed, -100);
+    motors->set_velocities(params->maze_speed, -100);
   } else if (current_manoeuvre == 2) {
-    motors->set_velocities(maze_speed, 0, true);
+    motors->set_velocities(params->maze_speed * 0.5, 0, true);
   } else {
     double error = (double) ir->get_right_wall_error();
     double turning_speed = wall_pid->calc(error);
-    constrain(-80, 80, &turning_speed);
-    motors->set_velocities(maze_speed, turning_speed);
+    constrain(-95, 95, &turning_speed);
+    motors->set_velocities(params->maze_speed, turning_speed);
   }
 }

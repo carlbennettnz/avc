@@ -14,6 +14,7 @@ PID wall_pid;
 Reporter reporter;
 
 components bundle = { &camera, &ir, &gate, &motors, &line_pid, &wall_pid, &reporter };
+control_params params;
 
 int main(int argc, char *argv[]) {
   // Default config file path
@@ -111,11 +112,15 @@ void init_hardware_controllers(std::string config_path) {
 
   // reporter.connect_to_server();
 
+  params.line_speed = config.GetReal("controller", "line_speed", 20);
+  params.maze_speed = config.GetReal("controller", "maze_speed", 25);
+  params.turn_180_time = config.GetReal("controller", "turn_180_time", 0.5);
+  params.turn_left_time = config.GetReal("controller", "turn_left_time", 0.7);
+
   controller.init(
     &bundle,
     config.Get("controller", "stage", "line"),
-    config.GetReal("controller", "line_speed", 20),
-    config.GetReal("controller", "maze_speed", 25)
+    &params
   );
 }
 

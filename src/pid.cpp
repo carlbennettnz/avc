@@ -26,13 +26,13 @@ double PID::calc(double error) {
 
   double i = total_error;
 
-  std::cout
-    << "kp: " << kp << '\t'
-    << "e: " << error << '\t'
-    << "p: " << kp * p << '\t'
-    << "i: " << ki * i << '\t'
-    << "d: " << kd * d << '\t'
-    << std::endl;
+  // std::cout
+  //   << "kp: " << kp << '\t'
+  //   << "e: " << error << '\t'
+  //   << "p: " << kp * p << '\t'
+  //   << "i: " << ki * i << '\t'
+  //   << "d: " << kd * d << '\t'
+  //   << std::endl;
 
   // Apply coefficients and return
   return -1 * (kp * p + ki * i + kd * d);

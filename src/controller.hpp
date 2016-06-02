@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "components.hpp"
+#include "defines.hpp"
 #include "camera.hpp"
 #include "ir.hpp"
 #include "gate.hpp"
@@ -15,7 +15,7 @@
 
 class Controller {
   public:
-    void init(components* comp, std::string _stage, double _line_speed, double _maze_speed);
+    void init(components* comp, std::string _stage, control_params* _params);
     void go();
     void stop();
 
@@ -33,17 +33,18 @@ class Controller {
     PID* wall_pid;
     Reporter* reporter;
 
+    // Config
+    control_params* params;
+
     // State tracking
     std::string stage;
 
     // Line following
-    double line_speed;
     double line_error;
     bool is_turning_left;
     bool is_turning_right;
 
     // Maze navigation
-    double maze_speed;
     int current_manoeuvre = 0;
     long current_manoeuvre_end_time;
 };

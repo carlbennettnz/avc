@@ -15,7 +15,7 @@
 #include "motors.hpp"
 #include "pid.hpp"
 #include "reporter.hpp"
-#include "components.hpp"
+#include "defines.hpp"
 
 extern "C" int init(int);
 extern "C" int set_motor(int motor, int speed);

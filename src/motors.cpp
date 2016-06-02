@@ -20,6 +20,8 @@ void Motors::init(double min, double max, double left, double right) {
 void Motors::set_velocities(double forward, double turning, bool _doDonuts) {
   doDonuts = _doDonuts;
 
+  std::cout << "forward speed: " << forward << std::endl;
+
   // Ensure the given values are valid
   constrain(-100, 100, &forward);
   constrain(-100, 100, &turning);
@@ -28,7 +30,7 @@ void Motors::set_velocities(double forward, double turning, bool _doDonuts) {
   forward_speed = forward / 100;
   turning_speed = turning / 100;
 
-  std::cout << "turning speed: " << turning << std::endl;
+  std::cout << "forward speed: " << forward << std::endl;
 
   // Send the change to the motors
   update();
@@ -52,7 +54,7 @@ void Motors::stop_all() {
   speed.
 */
 void Motors::update() {
-  std::cout << doDonuts << std::endl;
+  std::cout << forward_speed << std::endl;
   if (doDonuts) {
     set_motor(2, forward_speed * max_speed * left_multiplier);
     set_motor(1, -forward_speed * max_speed * right_multiplier);

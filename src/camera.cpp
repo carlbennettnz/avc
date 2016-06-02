@@ -23,7 +23,7 @@ void Camera::process_image() {
 
   double average_brightness = get_average_brightness();
 
-  get_row(ahead_pixels, img_height - 40 - 1, 20);
+  get_row(ahead_pixels, img_height - 30 - 1, 15);
   get_col(left_pixels, img_width - 10 - 1, 10);
   get_col(right_pixels, 10 - 1, 3);
 
