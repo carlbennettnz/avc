@@ -95,7 +95,7 @@ void Controller::navigate_maze() {
 
   // Check for new manoeuvres to perform
   if (current_manoeuvre == 0) {
-    if (front > 180 && left < 175 && right > 250) {
+    if (front > 190 && left < 175 && right > 250) {
       current_manoeuvre = 1;
       current_manoeuvre_end_time = time + params->turn_left_time * 1000 * 1000;
       // std::cout << "--- started left turn ---" << std::endl;
